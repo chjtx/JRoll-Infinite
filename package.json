@@ -1,0 +1,22 @@
+{
+  "name": "jroll-infinite",
+  "version": "2.1.3",
+  "description": "JRoll的无限加载扩展",
+  "main": "jroll-infinite.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chjtx/JRoll-Infinite.git"
+  },
+  "keywords": [
+    "jroll-infinite.js"
+  ],
+  "author": "BarZu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chjtx/JRoll-Infinite/issues"
+  },
+  "homepage": "https://github.com/chjtx/JRoll-Infinite#readme"
+}
