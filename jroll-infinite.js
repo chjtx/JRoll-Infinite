@@ -1,4 +1,4 @@
-/*! JRoll-Infinite v2.1.3 ~ (c) 2016 Author:BarZu Git:https://github.com/chjtx/JRoll/tree/master/extends/jroll-infinite */
+/*! JRoll-Infinite v2.1.4 ~ (c) 2016 Author:BarZu Git:https://github.com/chjtx/JRoll/tree/master/extends/jroll-infinite */
 /* global define, JRoll */
 (function (window, document, JRoll) {
   'use strict'
@@ -63,7 +63,7 @@
     var me = this
     var lock
     var compiled
-    var clearRegExp
+    // var clearRegExp
     var keys = Object.keys(params || {})
 
     // 默认选项
@@ -88,7 +88,7 @@
     me.options.page = 1
     me.infinite_callback = callback
     compiled = options.compile(options.template, options.root)
-    clearRegExp = new RegExp('(' + filterRegChar(options.loadingTip) + '|' + filterRegChar(options.completeTip) + ')', 'g')
+    // clearRegExp = new RegExp('(' + filterRegChar(options.loadingTip) + '|' + filterRegChar(options.completeTip) + ')', 'g')
 
     // 创建jroll-infinite的jroll-style样式
     var style = document.getElementById('jroll_style')
@@ -124,11 +124,11 @@
     })
 
     // 过滤正则特殊字符，由于不能保证浏览转换成innerHTML时单双引号的正确性，因此要特殊处理
-    function filterRegChar (str) {
-      return str.replace(/("|')|\$|\(|\)|\+|\*|\.|\[|]|\?|\\|\^|\{|\}|\|/g, function (match, quote) {
-        return quote ? "[\"']" : '\\' + match
-      })
-    }
+    // function filterRegChar (str) {
+    //   return str.replace(/("|')|\$|\(|\)|\+|\*|\.|\[|]|\?|\\|\^|\{|\}|\|/g, function (match, quote) {
+    //     return quote ? "[\"']" : '\\' + match
+    //   })
+    // }
 
     // 渲染视图
     function callback (data) {
@@ -147,7 +147,13 @@
 
       html += me.options.total === me.options.page ? options.completeTip : options.loadingTip
 
-      me.scroller.innerHTML = me.scroller.innerHTML.replace(clearRegExp, '') + html
+      /**
+       * Fixed Issue: https://github.com/chjtx/JRoll/issues/21
+       * 修复在IOS上大量图片时闪屏的问题
+       */
+      // me.scroller.innerHTML = me.scroller.innerHTML.replace(clearRegExp, '') + html
+      if (me.scroller.lastElementChild) me.scroller.removeChild(me.scroller.lastElementChild)
+      me.scroller.insertAdjacentHTML('beforeend', html)
 
       me.refresh()
 
@@ -182,7 +188,7 @@
     }
   }
 
-  JRoll.prototype.infinite.version = '2.1.3'
+  JRoll.prototype.infinite.version = '2.1.4'
 
   // CommonJS/AMD/CMD规范导出JRoll
   if (typeof module !== 'undefined' && module.exports) {
