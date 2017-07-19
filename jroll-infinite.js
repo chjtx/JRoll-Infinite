@@ -1,4 +1,4 @@
-/*! JRoll-Infinite v2.1.4 ~ (c) 2016 Author:BarZu Git:https://github.com/chjtx/JRoll/tree/master/extends/jroll-infinite */
+/*! JRoll-Infinite v2.2.0 ~ (c) 2016-2017 Author:BarZu Git:https://github.com/chjtx/JRoll/tree/master/extends/jroll-infinite */
 /* global define, JRoll */
 (function (window, document, JRoll) {
   'use strict'
@@ -63,7 +63,6 @@
     var me = this
     var lock
     var compiled
-    // var clearRegExp
     var keys = Object.keys(params || {})
 
     // 默认选项
@@ -75,6 +74,7 @@
       template: '', // 每条数据模板
       loadingTip: '<div class="jroll-infinite-tip">正在加载...</div>', // 正在加载提示信息
       completeTip: '<div class="jroll-infinite-tip">已加载全部内容</div>', // 加载完成提示信息
+      errorTip: '<div class="jroll-infinite-tip">加载失败，上拉重试！</div>', // 加载失败提示信息
       root: '_obj', // 给内置模板引擎指定根数据变量
       compile: compile, // 编译方法
       render: render // 渲染方法
@@ -87,8 +87,8 @@
     me.options.total = options.total
     me.options.page = 1
     me.infinite_callback = callback
+    me.infinite_error_callback = errorCallback
     compiled = options.compile(options.template, options.root)
-    // clearRegExp = new RegExp('(' + filterRegChar(options.loadingTip) + '|' + filterRegChar(options.completeTip) + ')', 'g')
 
     // 创建jroll-infinite的jroll-style样式
     var style = document.getElementById('jroll_style')
@@ -110,25 +110,27 @@
     // 首次加载数据
     if (typeof options.getData === 'function') {
       me.scroller.innerHTML = options.loadingTip
-      options.getData(me.options.page, callback)
+      options.getData(me.options.page, callback, errorCallback)
     }
 
     // 滑动结束，加载下一页
     me.on('scrollEnd', function () {
-      if (me.y < me.maxScrollY + me.scroller.querySelector('.jroll-infinite-tip').offsetHeight && me.options.page !== me.options.total && !lock) {
+      var tip = me.scroller.querySelector('.jroll-infinite-tip')
+      if (me.y < me.maxScrollY + tip.offsetHeight && me.options.page !== me.options.total && !lock) {
         lock = true // 防止数据加载完成前触发加载下一页
-        options.getData(++me.options.page, callback)
+        tip.innerHTML = options.loadingTip
+        options.getData(++me.options.page, callback, errorCallback)
       }
 
       lightenPage()
     })
 
-    // 过滤正则特殊字符，由于不能保证浏览转换成innerHTML时单双引号的正确性，因此要特殊处理
-    // function filterRegChar (str) {
-    //   return str.replace(/("|')|\$|\(|\)|\+|\*|\.|\[|]|\?|\\|\^|\{|\}|\|/g, function (match, quote) {
-    //     return quote ? "[\"']" : '\\' + match
-    //   })
-    // }
+    function errorCallback () {
+      var div = me.scroller.querySelector('.jroll-infinite-tip')
+      div.innerHTML = options.errorTip
+      --me.options.page
+      lock = false
+    }
 
     // 渲染视图
     function callback (data) {
@@ -188,7 +190,7 @@
     }
   }
 
-  JRoll.prototype.infinite.version = '2.1.4'
+  JRoll.prototype.infinite.version = '2.2.0'
 
   // CommonJS/AMD/CMD规范导出JRoll
   if (typeof module !== 'undefined' && module.exports) {
